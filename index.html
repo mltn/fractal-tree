@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+	<form>
+		<legend>controls</legend>
+		<label for="angle">angle</label>
+		<input id="angle" type="number" value="120"
+			   step="5"/>
+
+		<label for="branching-angle">branching angle</label>
+		<input id="branching-angle" type="number" value="15"
+			   step="1"/>
+
+		<label for="reduction-coef">reduction coef</label>
+		<input id="reduction-coef" type="number" value="0.8"
+			   step="0.1"/>
+		<button type="button" onclick="render()">render</button>
+	</form>
+    <canvas id="my_canvas" width="1000" height="800"></canvas>
+    <script>
+    var myCanvas = document.getElementById("my_canvas");
+    var ctx = myCanvas.getContext("2d");
+    function draw(startX, startY, len, angle, branchWidth, branchingAngle, reductionCoef) {
+        ctx.lineWidth = branchWidth;
+
+        ctx.beginPath();
+        ctx.save();
+
+        ctx.strokeStyle = "green";
+        ctx.fillStyle = "green";
+
+        ctx.translate(startX, startY);
+        ctx.rotate(angle * Math.PI/180);
+        ctx.moveTo(0, 0);
+        ctx.lineTo(0, -len);
+        ctx.stroke();
+
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = "rgba(0,0,0,0.8)";
+
+        if(len < 10) {
+            ctx.restore();
+            return;
+        }
+        draw(0, -len, len*reductionCoef, angle-branchingAngle, branchWidth*reductionCoef, branchingAngle, reductionCoef);
+        draw(0, -len, len*reductionCoef, angle+branchingAngle, branchWidth*reductionCoef, branchingAngle, reductionCoef);
+
+        ctx.restore();
+    }
+    
+	function render(){
+		ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
+		const angle = document.getElementById('angle').value;
+		const branchingAngle = document.getElementById('branching-angle').value;
+		const reductionCoef = document.getElementById('reduction-coef').value;
+		
+		draw(400, 600, +angle, 0, 10, +branchingAngle, +reductionCoef);
+	}     
+    </script>
+</body>
+</html>
